@@ -1,41 +1,64 @@
 import {
   changeCurrentRenderData,
   getCurrentRenderData,
+  resetRenderData,
 } from "./currentRenderData";
 import { map } from "./index";
+import insertToRoot from "./insertToRoot";
 
-// функция рендера компонента
-const render = (component) => {
+const render = (component, forceData = null) => {
   const currentRenderDataTemplate = {
     statesOrder: [],
     index: null,
     changeStateOrder: [],
-    effect: null,
     effects: [],
     effectIndex: null,
+    component,
   };
-
   const newCurrentRenderData = map.get(component) || currentRenderDataTemplate;
-  changeCurrentRenderData(newCurrentRenderData);
-  const currentRenderData = getCurrentRenderData();
+  if (forceData) {
+    const [index, value] = forceData;
 
-  // сам рендер компонента
-  component();
+    newCurrentRenderData.statesOrder[index].value = value;
 
-  // проверка на наличие изменений после рендера
-  if (currentRenderData.changeStateOrder.length > 0) {
     const newValue = {
-      ...currentRenderData,
+      ...newCurrentRenderData,
       index: null,
       changeStateOrder: [],
       effectIndex: null,
     };
+    changeCurrentRenderData(newValue);
 
     map.set(component, newValue);
+    const componentReturnedData = component();
+
+    insertToRoot(componentReturnedData);
+    resetRenderData();
+    return componentReturnedData;
+  }
+
+  const currentRenderData = changeCurrentRenderData(newCurrentRenderData);
+
+  const componentReturnedData = component();
+
+  const newValue = {
+    ...currentRenderData,
+    index: null,
+    changeStateOrder: [],
+    effectIndex: null,
+  };
+  map.set(component, newValue);
+
+  insertToRoot(componentReturnedData);
+
+  if (currentRenderData.changeStateOrder.length > 0) {
+    // map.set(component, newValue);
     changeCurrentRenderData(newValue);
-    // рекурсивно запускаем еще один рендер, если были изменения
+
     render(component);
   }
+  resetRenderData();
+  return componentReturnedData;
 };
 
 export default render;

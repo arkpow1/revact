@@ -3,7 +3,7 @@ import { useMyState, useKekffeсt } from "./scripts";
 
 const useCustomHook = () => {
   const [kek, setKek] = useMyState(1);
-  const [kek2, setKek2] = useMyState(10);
+  const [kek2, setKek2] = useMyState(100);
 
   return { kek, setKek, kek2, setKek2 };
 };
@@ -11,29 +11,28 @@ const useCustomHook = () => {
 const ExampleComponent = () => {
   const { kek, setKek, kek2, setKek2 } = useCustomHook();
 
-  if (kek < 5) {
-    setKek(kek + 1);
-  } else if (kek2 < 15) {
-    setKek2(kek2 + 1);
+  // const setValue = async () => {
+  //   const test = await fetch(
+  //     `https://jsonplaceholder.typicode.com/todos/${kek}`
+  //   );
+  //   const response = await test.json();
+
+  //   setTimeout(() => {
+  //     setKek(kek + 1);
+  //     setKek2(JSON.stringify(response));
+  //   }, 1000);
+  // };
+
+  if (kek2 < 105) {
+    setTimeout(() => {
+      setKek(kek + 1);
+      setKek2(kek2 + 1);
+    }, 1000);
   }
 
-  useKekffeсt(() => {
-    console.log("kek FIRST in body", kek);
+  console.log("render");
 
-    return () => {
-      console.log("kek FIRST in return", kek);
-    };
-  }, [kek]);
-
-  useKekffeсt(() => {
-    console.log("kek2 SECOND in body", kek2);
-
-    return () => {
-      console.log("kek2 SECOND in return", kek2);
-    };
-  }, [kek2]);
-
-  return null;
+  return `<div>kek is ${kek}, kek2 is ${kek2}</div>`;
 };
 
 const SecondExampleComponent = () => {
@@ -48,11 +47,11 @@ const SecondExampleComponent = () => {
 
 // типа корневой "компонент"
 const App = () => {
-  const ExampleClone = ExampleComponent.bind(this); // создаю копию функции ExampleComponent
-  // рендер - синхронная операция
-  render(ExampleComponent); // сначала рендерится этот (состояние запоминается в мапе)
-  render(SecondExampleComponent); // потом этот (состояние запоминается в мапе)
-  render(ExampleClone); // потом рендерится клон (у него рендер начинается с начала)
+  const ExampleClone = ExampleComponent.bind(this);
+
+  return render(ExampleComponent);
 };
+
+//
 
 export default App;

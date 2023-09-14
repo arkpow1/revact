@@ -1,4 +1,5 @@
 import { getCurrentRenderData } from "./currentRenderData";
+import render from "./render";
 
 // диспетчер хуков
 const dispatcher = (initValue) => {
@@ -29,21 +30,27 @@ const dispatcher = (initValue) => {
 };
 
 // функция изменяет данные в четко определенном хуке
-const stateChanger = (value, index) => {
-  const currentRenderData = getCurrentRenderData();
-
-  currentRenderData.statesOrder[index].value = value;
-  return { index, value };
-};
+function stateChanger(value, index, component) {
+  if (getCurrentRenderData().component === null) {
+    // console.log(component);
+    render(component, [index, value]);
+  } else {
+    getCurrentRenderData().statesOrder[index].value = value;
+    return { index, value };
+  }
+}
 
 const useMyState = (initValue) => {
   const { value: state, index } = dispatcher(initValue);
   const currentRenderData = getCurrentRenderData();
+  const component = currentRenderData.component;
 
   let changedState = state;
 
   const setState = (value) => {
-    currentRenderData.changeStateOrder.push(stateChanger(value, index));
+    currentRenderData.changeStateOrder.push(
+      stateChanger(value, index, component)
+    );
   };
 
   return [changedState, setState];
