@@ -6,7 +6,44 @@ import {
 import { map } from "./index";
 import insertToRoot from "./insertToRoot";
 
-const render = (component, forceData = null) => {
+let asyncChanges = [];
+
+export const forceRender = (component, forceData) => {
+  asyncChanges.push(forceData);
+
+  const stringifiedTest = JSON.stringify(asyncChanges);
+
+  setTimeout(() => {
+    const isEqual = stringifiedTest === JSON.stringify(asyncChanges);
+
+    if (isEqual) {
+      const newCurrentRenderData =
+        map.get(component) || currentRenderDataTemplate;
+
+      asyncChanges.forEach(([index, value]) => {
+        newCurrentRenderData.statesOrder[index].value = value;
+      });
+
+      const newValue = {
+        ...newCurrentRenderData,
+        index: null,
+        changeStateOrder: [],
+        effectIndex: null,
+      };
+      changeCurrentRenderData(newValue);
+
+      map.set(component, newValue);
+      const componentReturnedData = component();
+
+      insertToRoot(componentReturnedData);
+      resetRenderData();
+      asyncChanges = [];
+      return componentReturnedData;
+    }
+  }, 0);
+};
+
+const render = (component) => {
   const currentRenderDataTemplate = {
     statesOrder: [],
     index: null,
@@ -15,27 +52,8 @@ const render = (component, forceData = null) => {
     effectIndex: null,
     component,
   };
+
   const newCurrentRenderData = map.get(component) || currentRenderDataTemplate;
-  if (forceData) {
-    const [index, value] = forceData;
-
-    newCurrentRenderData.statesOrder[index].value = value;
-
-    const newValue = {
-      ...newCurrentRenderData,
-      index: null,
-      changeStateOrder: [],
-      effectIndex: null,
-    };
-    changeCurrentRenderData(newValue);
-
-    map.set(component, newValue);
-    const componentReturnedData = component();
-
-    insertToRoot(componentReturnedData);
-    resetRenderData();
-    return componentReturnedData;
-  }
 
   const currentRenderData = changeCurrentRenderData(newCurrentRenderData);
 

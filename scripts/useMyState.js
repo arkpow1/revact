@@ -1,5 +1,6 @@
 import { getCurrentRenderData } from "./currentRenderData";
 import render from "./render";
+import { forceRender } from "./render";
 
 // диспетчер хуков
 const dispatcher = (initValue) => {
@@ -33,7 +34,7 @@ const dispatcher = (initValue) => {
 function stateChanger(value, index, component) {
   if (getCurrentRenderData().component === null) {
     // console.log(component);
-    render(component, [index, value]);
+    forceRender(component, [index, value]);
   } else {
     getCurrentRenderData().statesOrder[index].value = value;
     return { index, value };
