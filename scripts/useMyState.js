@@ -33,11 +33,18 @@ const dispatcher = (initValue) => {
 // функция изменяет данные в четко определенном хуке
 function stateChanger(value, index, component) {
   if (getCurrentRenderData().component === null) {
-    // console.log(component);
+    // для форс рендера проверка на функцию происходит в render
     forceRender(component, [index, value]);
   } else {
-    getCurrentRenderData().statesOrder[index].value = value;
-    return { index, value };
+    let newValue = value;
+    if (typeof value === "function") {
+      const prevValue = getCurrentRenderData().statesOrder[index].value;
+      newValue = value(prevValue);
+      getCurrentRenderData().statesOrder[index].value = newValue;
+      return { index, value: newValue };
+    }
+    getCurrentRenderData().statesOrder[index].value = newValue;
+    return { index, value: newValue };
   }
 }
 

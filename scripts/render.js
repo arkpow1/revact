@@ -21,6 +21,11 @@ export const forceRender = (component, forceData) => {
         map.get(component) || currentRenderDataTemplate;
 
       asyncChanges.forEach(([index, value]) => {
+        if (typeof value === "function") {
+          const prevValue = newCurrentRenderData.statesOrder[index].value;
+          newCurrentRenderData.statesOrder[index].value = value(prevValue);
+          return;
+        }
         newCurrentRenderData.statesOrder[index].value = value;
       });
 

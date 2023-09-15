@@ -13,15 +13,17 @@ const useCustomHook = () => {
 const ExampleComponent = () => {
   const { kek, setKek, kek2, setKek2, sync, setSync } = useCustomHook();
 
-  if (kek < 20) {
-    setTimeout(() => {
-      setKek(kek + 1);
-      setKek2(kek2 + 1);
-    }, 1000);
-  }
+  useKekffeсt(() => {
+    if (kek < 15) {
+      setTimeout(() => {
+        setKek((prev) => prev + 1);
+        setKek2((prev) => prev + 1);
+      }, 1000);
+    }
+  }, [kek, kek2]);
 
-  if (sync < 10) {
-    setSync(sync + 1);
+  if (sync < 5) {
+    setSync((prev) => prev + 1);
   }
 
   console.log("render");
