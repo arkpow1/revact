@@ -28,6 +28,7 @@ const updateEffectElement = (callback, deps, currentIndex) => {
 
 const effectDispatcher = (callback, deps) => {
   const currentRenderData = getCurrentRenderData();
+  // const isFirstMount = currentRenderData.isFirstMount;
 
   const { effectIndex, effects } = currentRenderData;
   const currentIndex = effectIndex === null ? 0 : effectIndex + 1;

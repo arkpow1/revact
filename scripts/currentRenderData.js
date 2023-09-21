@@ -5,6 +5,7 @@ let currentRenderData = {
   effects: [],
   effectIndex: null,
   component: null,
+  isFirstMount: true,
 };
 
 export const changeCurrentRenderData = (data) => {
@@ -21,6 +22,7 @@ export const resetRenderData = () => {
     effects: [],
     effectIndex: null,
     component: null,
+    isFirstMount: true,
   });
 };
 
